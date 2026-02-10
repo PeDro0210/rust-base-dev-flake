@@ -54,6 +54,8 @@
           env.RUSTFLAGS = "-C link-args=-Wl,-rpath,${pkgs.lib.makeLibraryPath link_flag}";
         };
 
+        templates.default.path = ./.;
+
         devShell = pkgs.mkShell {
           packages = std_bin;
         };
