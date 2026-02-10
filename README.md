@@ -10,6 +10,12 @@ A nix flake for setting up nix devshels and package with Naersk flake
 
 ### Vanilla
 
+- init rust project
+```fish
+nix run nixpkgs#cargo init
+nix run nixpkgs#cargo generate-lockfile
+```
+
 - Init flake template.
 
 ```fish
