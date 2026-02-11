@@ -32,13 +32,12 @@
           clang
           pkg-config
           cargo
-          bacon
+          bacon # background compiler
           rustc
           rust-analyzer
           clippy
           rustfmt
           taplo # lsp for cargo.toml
-          bacon
         ];
 
         link_flag = base_lib ++ std_bin;
