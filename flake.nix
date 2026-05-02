@@ -20,6 +20,11 @@
         "aarch64-darwin"
       ];
 
+      flake = {
+
+        templates.default.path = ./.;
+      };
+
       perSystem =
         {
           config,
@@ -58,7 +63,6 @@
           packages.default = craneLib.buildPackage {
             inherit nativeBuildInputs buildInputs;
             src = ./.;
-
           };
 
           devShells = pkgs.mkShell {
