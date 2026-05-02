@@ -2,63 +2,79 @@
   description = "A nix flake for working with vanilla rust";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
-    naersk.url = "github:nix-community/naersk";
-
-    flake-utils.url = "github:numtide/flake-utils";
+    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-25.11";
+    crane.url = "github:ipetkov/crane";
+    flake-parts.url = "github:hercules-ci/flake-parts";
   };
 
   outputs =
     {
-      nixpkgs,
-      naersk,
-      flake-utils,
+      crane,
+      flake-parts,
       ...
-    }:
+    }@inputs:
+    flake-parts.lib.mkFlake { inherit inputs; } {
 
-    flake-utils.lib.eachDefaultSystem (
-      system:
-      let
+      systems = [
+        "x86_64-linux"
+        "aarch64-darwin"
+      ];
 
-        pkgs = nixpkgs.legacyPackages.${system};
-        naerskLib = pkgs.callPackages naersk { };
+      perSystem =
+        {
+          config,
+          self',
+          inputs',
+          pkgs,
+          system,
+          ...
+        }:
+        let
 
-        base_lib = with pkgs; [
-        ];
+          craneLib = crane.mkLib pkgs;
 
-        std_bin = with pkgs; [
-          glfw
-          cmake
-          clang
-          pkg-config
-          cargo
-          bacon # background compiler
-          rustc
-          rust-analyzer
-          clippy
-          rustfmt
-          taplo # lsp for cargo.toml
-        ];
+          buildInputs = with pkgs; [
+            expat
+            fontconfig
+            freetype
+            freetype.dev
+            libGL
+            pkg-config
+          ];
 
-        link_flag = base_lib ++ std_bin;
-      in
-      {
+          nativeBuildInputs = with pkgs; [
+            glfw
+            cmake
+            clang
+            cargo
+            rustc
+          ];
 
-        # declaring the build with the naerskLib flake
-        packages.default = naerskLib.buildPackage {
-          src = ./.;
-          buildInputs = base_lib;
-          nativeBuildInputs = std_bin;
+        in
 
-          env.RUSTFLAGS = "-C link-args=-Wl,-rpath,${pkgs.lib.makeLibraryPath link_flag}";
+        {
+
+          # declaring the build with the naerskLib flake
+          packages.default = craneLib.buildPackage {
+            inherit nativeBuildInputs buildInputs;
+            src = ./.;
+
+          };
+
+          devShells = pkgs.mkShell {
+            inherit nativeBuildInputs buildInputs;
+
+            packages = with pkgs; [
+              cargo
+              bacon
+              rust-analyzer
+              clippy
+              rustfmt
+              taplo # lsp for cargo.toml
+            ];
+
+          };
         };
+    };
 
-        templates.default.path = ./.;
-
-        devShell = pkgs.mkShell {
-          packages = std_bin;
-        };
-
-      }
-    );
 }
