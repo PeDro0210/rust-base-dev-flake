@@ -56,6 +56,9 @@
             clippy
             rustfmt
 
+          ];
+
+          packages = with pkgs; [
             cargo
             bacon
             taplo # lsp for cargo.toml
@@ -63,6 +66,7 @@
             rust-analyzer
             clippy
             rustfmt
+
           ];
 
         in
@@ -73,6 +77,10 @@
           packages.default = craneLib.buildPackage {
             inherit nativeBuildInputs buildInputs;
             src = ./.;
+          };
+
+          devShells.default = pkgs.mkShell {
+            inherit nativeBuildInputs buildInputs packages;
           };
 
         };
