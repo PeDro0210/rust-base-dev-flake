@@ -21,7 +21,6 @@
       ];
 
       flake = {
-
         templates.default.path = ./.;
       };
 
@@ -51,8 +50,19 @@
             glfw
             cmake
             clang
-            cargo
+
             rustc
+            rust-analyzer
+            clippy
+            rustfmt
+
+            cargo
+            bacon
+            taplo # lsp for cargo.toml
+            rustc
+            rust-analyzer
+            clippy
+            rustfmt
           ];
 
         in
@@ -65,19 +75,6 @@
             src = ./.;
           };
 
-          devShells = pkgs.mkShell {
-            inherit nativeBuildInputs buildInputs;
-
-            packages = with pkgs; [
-              cargo
-              bacon
-              rust-analyzer
-              clippy
-              rustfmt
-              taplo # lsp for cargo.toml
-            ];
-
-          };
         };
     };
 
